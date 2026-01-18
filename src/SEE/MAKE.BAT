@@ -36,6 +36,7 @@ if errorlevel 1 goto oops
 asm88 move
 if errorlevel 1 goto oops
 
+copy exec.ooo exec.o
 bind see more screen wrap buffer view block extmem macro dosint move exec pcfast -os.exe
 
 :oops
