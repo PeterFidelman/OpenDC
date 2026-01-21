@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #define check(actual, expected, msg) \
 	if(((actual)) != ((expected))) { puts(msg); failures++; }
 
@@ -188,18 +190,213 @@ int f9() {
 	return failures;
 }
 
+int f10() {
+	unsigned char i, j;
+	unsigned k;
+	int failures = 0;
+	
+	i = 0; j = 1; k = i * j;
+	check(k, 0, "mul failed: u8 * u8 -> unsigned");
+
+	i = 2; j = 3; k = i * j;
+	check(k, 6, "mul failed: u8 * u8 -> unsigned");
+
+	i = 25; j = 16; k = i * j;
+	check(k, 400, "mul failed: u8 * u8 -> unsigned");
+
+	i = 254; j = 255; k = i * j;
+	check(k, 64770, "mul failed: u8 * u8 -> unsigned");
+
+	assert(i*j > 0);
+	check(i*j, 64770, "mul failed: u8 * u8 -> unsigned");
+
+	return failures;
+}
+
+int f11() {
+	signed char i, j;
+	int k;
+	int failures = 0;
+	
+	i = 0; j = 1; k = i * j;
+	check(k, 0, "mul failed: i8 * i8 -> int");
+
+	i = -2; j = 3; k = i * j;
+	check(k, -6, "mul failed: i8 * i8 -> int");
+
+	i = 25; j = 16; k = i * j;
+	check(k, 400, "mul failed: i8 * i8 -> int");
+
+	i = 64; j = -128; k = i * j;
+	check(k, -8192, "mul failed: i8 * i8 -> int");
+
+	assert(i*j < 0);
+	check(i*j, -8192, "mul failed: i8 * i8 -> int");
+
+	return failures;
+}
+
+int f12() {
+	signed char i;
+	unsigned char j;
+	int k;
+	int failures = 0;
+	
+	i = 0; j = 1; k = i * j;
+	check(k, 0, "mul failed: i8 * u8 -> int");
+
+	i = -2; j = 3; k = i * j;
+	check(k, -6, "mul failed: i8 * u8 -> int");
+
+	i = 25; j = 16; k = i * j;
+	check(k, 400, "mul failed: i8 * u8 -> int");
+
+	i = -64; j = 128; k = i * j;
+	check(k, -8192, "mul failed: i8 * u8 -> int");
+
+	assert(i*j < 0);
+	check(i*j, -8192, "mul failed: i8 * u8 -> int");
+
+	return failures;
+}
+
+int f13() {
+	unsigned char i;
+	signed char j;
+	int k;
+	int failures = 0;
+	
+	i = 0; j = 1; k = i * j;
+	check(k, 0, "mul failed: u8 * i8 -> int");
+
+	i = 2; j = -3; k = i * j;
+	check(k, -6, "mul failed: u8 * i8 -> int");
+
+	i = 25; j = 16; k = i * j;
+	check(k, 400, "mul failed: u8 * i8 -> int");
+
+	i = 64; j = -128; k = i * j;
+	check(k, -8192, "mul failed: u8 * i8 -> int");
+
+	assert(i*j < 0);
+	check(i*j, -8192, "mul failed: u8 * i8 -> int");
+
+	return failures;
+}
+
+int f14() {
+	signed char i;
+	int j, k;
+	int failures = 0;
+	
+	i = 0; j = 1; k = i * j;
+	check(k, 0, "mul failed: i8 * int -> int");
+
+	i = -2; j = 3; k = i * j;
+	check(k, -6, "mul failed: i8 * int -> int");
+
+	i = 25; j = 16; k = i * j;
+	check(k, 400, "mul failed: i8 * int -> int");
+
+	i = 64; j = -128; k = i * j;
+	check(k, -8192, "mul failed: i8 * int -> int");
+
+	return failures;
+}
+
+int f15() {
+	signed char j;
+	int i, k;
+	int failures = 0;
+	
+	i = 0; j = 1; k = i * j;
+	check(k, 0, "mul failed: int * i8 -> int");
+
+	i = -2; j = 3; k = i * j;
+	check(k, -6, "mul failed: int * i8 -> int");
+
+	i = 25; j = 16; k = i * j;
+	check(k, 400, "mul failed: int * i8 -> int");
+
+	i = 64; j = -128; k = i * j;
+	check(k, -8192, "mul failed: int * i8 -> int");
+
+	return failures;
+}
+
+int f16() {
+	unsigned char i, j, k;
+	int failures = 0;
+	
+	i = 0; j = 1; k = i / j;
+	check(k, 0, "div failed: u8 / u8 -> u8");
+
+	i = 6; j = 3; k = i / j;
+	check(k, 2, "div failed: u8 / u8 -> u8");
+
+	i = 255; j = 15; k = i / j;
+	check(k, 17, "div failed: u8 / u8 -> u8");
+
+	i = 15; j = 255; k = i / j;
+	check(k, 0, "div failed: u8 / u8 -> u8");
+
+	return failures;
+}
+
+int f17() {
+	unsigned i;
+	unsigned char j, k;
+	int failures = 0;
+	
+	i = 0; j = 1; k = i / j;
+	check(k, 0, "div failed: unsigned / u8 -> u8");
+
+	i = 6; j = 3; k = i / j;
+	check(k, 2, "div failed: unsigned / u8 -> u8");
+
+	i = 400; j = 16; k = i / j;
+	check(k, 25, "div failed: unsigned / u8 -> u8");
+
+	i = 64770; j = 255; k = i / j;
+	check(k, 254, "div failed: unsigned / u8 -> u8");
+
+	return failures;
+}
+
+int f18() {
+	signed char i, j, k;
+	int failures = 0;
+	
+	i = 0; j = 1; k = i / j;
+	check(k, 0, "div failed: i8 / i8 -> i8");
+	printf("%d\n", (int) k);
+
+	i = -6; j = 3; k = i / j;
+	check(k, -2, "div failed: i8 / i8 -> i8");
+	printf("%d\n", (int) k);
+
+	i = 125; j = 5; k = i / j;
+	check(k, 25, "div failed: i8 / i8 -> i8");
+	printf("%d\n", (int) k);
+
+	i = 56; j = -7; k = i / j;
+	check(k, -8, "div failed: i8 / i8 -> i8");
+	printf("%d\n", (int) k);
+
+	i = -1; j = 2; k = i / j;
+	check(k, 0, "div failed: i8 / i8 -> i8");
+	printf("%d\n", (int) k);
+
+	return failures;
+}
+
 int main()
 {
 	int failures = 0;
-	failures += f1();
-	failures += f2();
-	failures += f3();
-	failures += f4();
-	failures += f5();
-	failures += f6();
-	failures += f7();
-	failures += f8();
-	failures += f9();
+	failures += f1() + f2() + f3() + f4() + f5();
+	failures += f6() + f7() + f8() + f9() + f10();
+	failures += f11() + f12() + f13() + f14() + f15();
+	failures += f16() + f17() + f18();
 	printf("tests finished, %d failures.\n", failures);
 	return 0;
 }
