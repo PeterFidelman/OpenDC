@@ -155,7 +155,8 @@ muldiv(type,vtype,lnode)
 		if (regat[DX] == 1) regat[DX]=0;
 		if (type == MUL) {
 			mtype=MUL86;
-			if (byt) vtype[VT]=CINT;
+			if (byt) vtype[VT]=CUNSG;
+			if (vtype[VT] == CSCHAR) forceint(vtype);
 			}
 		else mtype=DIV86;
 		/*	turn into IMUL and IDIV	*/

@@ -552,14 +552,6 @@ movreg(reg,vtype)
 
 	if (dest_es != ES) {
 		asm_move((vtype[VT] == CCHAR || vtype[VT] == CSCHAR ? toreglow(reg) : toreg(reg)),vtype);
-		if(vtype[VT] == CSCHAR) {
-			if(reg == AX) asm_cbw();
-			else {
-				asm_xchg(reg, AX);
-				asm_cbw();
-				asm_xchg(reg, AX);
-				}
-			}
 		}
 	if (vtype[VMORE] < AX || vtype[VMORE] > ES || vtype[VIS] != REGV) freev(vtype);
 	else regat[vtype[VVAL]]=0;
