@@ -71,7 +71,6 @@ genarith(node,vtype)
 	else muldiv(type,vtype,lnode);
 	}
 
-
 muldiv(type,vtype,lnode)
 	char type;
 	int vtype[],lnode[]; {
@@ -131,10 +130,7 @@ muldiv(type,vtype,lnode)
 		byt=vtype[VT]==CCHAR;
 		if (byt) {
 			if (lnode[VT] != CCHAR) {
-				if(lnode[VT] == CSCHAR)
-					asm_cbw();
-				else
-					asm_move(toreglow(AH),tocon(0));
+				asm_move(toreglow(AH),tocon(0));
 				vtype[VT]=CINT;
 				byt=0;
 				}
@@ -145,8 +141,13 @@ muldiv(type,vtype,lnode)
 			regat[DX]=1;
 			if (type != MUL)
 				if (((c_typ=vtype[VT]) == CINT || c_typ == CSCHAR)
-						&& ((c_typ=lnode[VT]) == CINT || c_typ == CCHAR || c_typ == CSCHAR))
+						&& ((c_typ=lnode[VT]) == CINT || c_typ == CCHAR || c_typ == CSCHAR)) {
+					// wanted to use forcel(vtype) but it emits weird asm
+					if (vtype[VT] == CSCHAR) {
+						asm_cbw();
+						}
 					asm_cwd();
+					}
 				else asm_add(XOR86,toreg(DX),toreg2(DX));
 			forceint(lnode);
 			}
