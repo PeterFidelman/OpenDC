@@ -520,6 +520,7 @@ int main()
 	f16(); f17(); f18(); f19(); f20();
 	f21(); f22(); f23(); f24(); f25();
 	f26();
-	printf("%d tests finished, %d failures.\n", tests, failures);
+	printf("%s: %d tests finished, %d failures.\n",
+		__FILE__, tests, failures);
 	return 0;
 }

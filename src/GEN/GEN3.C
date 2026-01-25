@@ -591,8 +591,13 @@ compare(node)
 			}
 		else forcereg(lnode);
 		}
-	if (type > NE)
-		if (vtype[VT] != CINT || lnode[VT] != CINT) type=type+4;
+	if (type > NE) {
+		if ((vtype[VT] != CINT && vtype[VT] != CSCHAR) ||
+			(lnode[VT] != CINT && lnode[VT] != CSCHAR)) {
+			/* unsigned comparison */
+			type=type+4;
+			}
+		}
 	if (vtype[VIS] == VARV)
 		if (lnode[VIS] == VARV) forcereg(lnode);
 	if (is_big) forcees(vtype);
