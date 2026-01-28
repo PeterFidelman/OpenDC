@@ -46,13 +46,11 @@ get2same(node,vtype,lnode)
 	forcerm(lnode);
 	forcerm(vtype);
 	if (lnode[VT] != vtype[VT]) {
-		if (lnode[VT] > vtype[VT]) {
-			if (lnode[VT] == CLONG) forcel(vtype);
-			else forceint(vtype);
-			}
+		if (lnode[VT] == CLONG) { forcel(vtype); }
+		else if (vtype[VT] == CLONG) { forcel(lnode); }
 		else {
-			if (vtype[VT] == CLONG) forcel(lnode);
-			else forceint(lnode);
+			forceint(vtype);
+			forceint(lnode);
 			}
 		}
 	}
