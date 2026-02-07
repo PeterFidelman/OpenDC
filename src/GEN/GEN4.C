@@ -74,9 +74,8 @@ genarith(node,vtype)
 muldiv(type,vtype,lnode)
 	char type;
 	int vtype[],lnode[]; {
-	char reg,byt; {
 	int mtype;
-	char c_typ;
+	int rtype;
 
 		if (type == MUL && lnode[VIS] == REGV) 
 			if (lnode[VVAL] == AX) flip(lnode,vtype);
@@ -127,55 +126,29 @@ muldiv(type,vtype,lnode)
 			}
 		force(vtype,AXPAT);
 		alterv(vtype);
-		byt=vtype[VT]==CCHAR;
-		if (byt) {
-			if (lnode[VT] != CCHAR) {
-				asm_move(toreglow(AH),tocon(0));
-				vtype[VT]=CINT;
-				byt=0;
-				}
-			else if (type != MUL) asm_move(toreglow(AH),tocon(0));
-			}
-		if (!byt) {
-			need(DXPAT);
-			regat[DX]=1;
-			if (type != MUL)
-				if (((c_typ=vtype[VT]) == CINT || c_typ == CSCHAR)
-						&& ((c_typ=lnode[VT]) == CINT || c_typ == CCHAR || c_typ == CSCHAR)) {
-					// wanted to use forcel(vtype) but it emits weird asm
-					if (vtype[VT] == CSCHAR) {
-						asm_cbw();
-						}
-					asm_cwd();
-					}
-				else asm_add(XOR86,toreg(DX),toreg2(DX));
-			forceint(lnode);
-			}
+		need(DXPAT);
+		regat[DX]=1;
 		forcemul(lnode);
 		if (is_big) forcees(lnode);
-		if (regat[DX] == 1) regat[DX]=0;
-		if (type == MUL) {
-			mtype=MUL86;
-			if (byt) vtype[VT]=CUNSG;
-			if (vtype[VT] == CSCHAR) forceint(vtype);
+		rtype = comntype(vtype, lnode);
+		forcetyp(vtype, rtype);
+		forcetyp(lnode, rtype);
+		if (type != MUL) {
+			if (rtype == CUNSG)
+				asm_add(XOR86,toreg(DX),toreg2(DX));
+			else if (rtype == CINT)
+				asm_cwd();
 			}
-		else mtype=DIV86;
-		/*	turn into IMUL and IDIV	*/
-		if (((c_typ = vtype[VT]) == CINT || c_typ == CSCHAR)
-				&& ((c_typ = lnode[VT]) == CINT || c_typ == CSCHAR))
-			mtype++;
+		mtype = (type == MUL)? MUL86 : DIV86;
+		if (rtype == CINT) mtype++;  // turn into IMUL/IDIV
 		asm_not(mtype,lnode);
 		freev(lnode);
 		if (type == MOD) {
-			if (byt) {
-				asm_move(toreglow(AL),toreglow2(AH));
-				}
-			else {
-				vtype[VVAL]=DX;
-				regat[DX]=regat[AX];
-				regat[AX]=0;
-				}
-			}
+			vtype[VVAL]=DX;
+			regat[DX]=regat[AX];
+			regat[AX]=0;
+		} else {
+			regat[DX]=0;
 		}
 	}
 
@@ -183,6 +156,7 @@ genadd(vtype,lnode)
 	int  vtype[],lnode[]; {
 	int  used;
 	int  vchar, lchar;
+	int type;
 
 	if (lnode[VIS] == CONSTV) {
 		if (lnode[VVAL] == 0) return;
@@ -209,24 +183,26 @@ genadd(vtype,lnode)
 			forceind(lnode);
 			regat[lnode[VVAL]]=vtype;
 			if (vtype[VVAL] == 8)
-				vtype[1]=(lnode[VVAL] == SI) ? 4:5;
+				vtype[VVAL]=(lnode[VVAL] == SI) ? 4:5;
 			else if (vtype[VVAL] == 7) {
 				vtype[VVAL] = (lnode[VVAL] == SI) ? 0:1;
 				}
 			else
-				vtype[1]=(lnode[VVAL] == SI) ? 2:3;
+				vtype[VVAL]=(lnode[VVAL] == SI) ? 2:3;
 			}
 		}
 	else {
 		if (lnode[VT] == PTRTO) flip(lnode,vtype);
-		if (vtype[VT] != lnode[VT]) {
-			vchar = (vtype[VT] == CCHAR || vtype[VT] == CSCHAR);
-			lchar = (lnode[VT] == CCHAR || lnode[VT] == CSCHAR);
-			if (vchar && !lchar) forceint(vtype);
-			else if (!vchar && lchar) forceint(lnode);
-		}
 		forcerm(lnode);
 		forcereg(vtype);
+
+		// DeSmet-ist "add" would use the following:
+		// type = (vtype[VT] > lnode[VT])? vtype[VT] : lnode[VT];
+
+		type = comntype(vtype, lnode);
+		forcetyp(vtype, type);
+		forcetyp(lnode, type);
+		
 		alterv(vtype);
 		if (is_big) forcees(lnode);
 		asm_add(ADD86,vtype,lnode);
@@ -237,6 +213,7 @@ genadd(vtype,lnode)
 gensub(vtype,lnode)
 	int  vtype[],lnode[]; {
 	int  vchar, lchar;
+	int  type;
 
 	if (lnode[VIS] == CONSTV) {
 		if (lnode[VVAL] == 0) return;
@@ -251,14 +228,16 @@ gensub(vtype,lnode)
 			}
 		}
 	if (lnode[VT] == PTRTO) flip(lnode,vtype);
-	if (lnode[VT] != vtype[VT]) {
-		vchar = (vtype[VT] == CCHAR || vtype[VT] == CSCHAR);
-		lchar = (lnode[VT] == CCHAR || lnode[VT] == CSCHAR);
-		if (vchar && !lchar) forceint(vtype);
-		else if (!vchar && lchar) forceint(lnode);
-	}
 	forcerm(lnode);
 	forcereg(vtype);
+
+	// DeSmet-ist "sub" would use the following:
+	// type = (vtype[VT] > lnode[VT])? vtype[VT] : lnode[VT];
+
+	type = comntype(vtype, lnode);
+	forcetyp(vtype, type);
+	forcetyp(lnode, type);
+
 	alterv(vtype);
 	if (is_big) forcees(lnode);
 	asm_add(SUB86,vtype,lnode);

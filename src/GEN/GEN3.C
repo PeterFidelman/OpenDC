@@ -618,7 +618,7 @@ genshift(node,vtype)
 	if (vtype[VT] == CLONG) {
 		force(sby,CXPAT);
 		force(vtype,AXPAT);
-		if (type == SHR) builtin(_SHR4); /* call _SHR4 */
+		if (type == SHR) builtin(_SAR4); /* call _SAR4 */
 		else builtin(_SHL4);			 /* call _SHL4 */
 		freev(sby);
 		}
@@ -650,9 +650,13 @@ genshift(node,vtype)
 		if (type == SHL) forceint(vtype);
 		forcereg(vtype);
 		alterv(vtype);
-		if (only1) asm_shift_1((type == SHR ? SHR86: SHL86),vtype);
+		if (type == SHL) type = SHL86;
 		else {
-			asm_shift_cl((type == SHR ? SHR86: SHL86),vtype);
+			type = (vtype[VT]==CSCHAR || vtype[VT]==CINT)? SAR86 : SHR86;
+			}
+		if (only1) asm_shift_1(type, vtype);
+		else {
+			asm_shift_cl(type, vtype);
 			freev(sby);
 			}
 		}
