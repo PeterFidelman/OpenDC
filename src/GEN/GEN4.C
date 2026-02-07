@@ -102,9 +102,10 @@ muldiv(type,vtype,lnode)
 				force(vtype,AXPAT);
 				alterv(vtype);
 				if (type == MUL) mtype=SHL86;
-				else if (vtype[VT] == CINT) {
+				else if (vtype[VT] == CINT || vtype[VT] == CSCHAR) {
 					mtype=SAR86;
 					need(DXPAT);
+					if (vtype[VT] == CSCHAR) asm_cbw();
 					asm_cwd();
 					if (lnode[VVAL] != 2) asm_add(XOR86,toreg(AX),toreg2(DX));
 					asm_add(SUB86,toreg(AX),toreg2(DX));
@@ -116,7 +117,7 @@ muldiv(type,vtype,lnode)
 					if (lnode[VVAL] == 8) {
 						asm_shift_1(mtype,vtype);
 						}
-					if (type != MUL && vtype[VT] == CINT) {
+					if (type != MUL && (vtype[VT] == CINT || vtype[VT] == CSCHAR)) {
 						if (lnode[VVAL] != 2) asm_add(XOR86,toreg(AX),toreg2(DX));
 						asm_add(SUB86,toreg(AX),toreg2(DX));
 						}
