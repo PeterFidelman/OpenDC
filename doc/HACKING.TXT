@@ -1,0 +1,95 @@
+Overall structure
+
+SRC\
+	C(88) is the compiler front-end.
+	GEN is the compiler back-end.
+	ASM(88) is the assembler.
+	BIND is the linker.
+
+When you call C88.EXE from the command line, the last thing it does is
+invoke GEN.EXE.  This uses the system path, so may not be the GEN.EXE
+that lives in the same folder as the C88.EXE that invoked it, beware!
+
+C88 passes data to GEN in two files: CTEMP1 and CTEMP2, respectively
+data and the AST.  You can use C88's x option to leave these files on
+disk, or ve or vs to pretty-print each one as it's generated.  In
+practice, vs is the most useful option because it dumps out the AST.
+
+GEN has two divergent back-ends: one that emits assembly, and one that
+directly emits binary objects (default).  So you could build a simple
+hello world program as either,
+
+c88 hello
+bind hello
+
+or,
+
+c88 hello a
+asm88 hello
+bind hello
+
+The binary back-end is used by default.  It is selected when the global
+variable zopt is 1.  When zopt is 0, the assembly back-end is used
+instead.
+
+BIND, the linker, does not perform link-time optimization, so the
+minimum program size is about 12K, the size of the run-time library.
+
+Source organization
+
+Most useful types and comments are in PASS1.H, PASS2.H. and NODES.H.
+Note that multiple copies of NODES.H are present and should be kept in
+agreement.
+
+ANSI C89 completeness
+
+As of its open source release, Open DeSmet supported:
+	(un/signed) char, (un/signed) int, long, float/double.
+
+Support for signed char was highly incomplete and buggy.
+
+A small amount of plumbing for unsigned long existed, but the compiler
+front-end spat out an error if you tried to declare an unsigned long.
+
+DeSmet-isms
+
+Some seemingly deliberate incompatibilities ("DeSmet-isms") existed in
+the initial open-source release.
+
+Addition and subtraction on the byte-variables (un/signed char)
+returned a byte-sized result instead of promoting to int.  This is
+mentioned on page 4.7 of the manual.  Other operations (multiplication,
+division, modulus) worked the standard way.
+
+Struct members are treated as offsets that can be applied to arbitrary
+pointers without casting.  For example,
+
+    struct {char a; char b;};
+    unsigned n = 0x1234;
+    char *p = &n;
+    printf("%x %x\n", (unsigned) p->a, (unsigned) p->b);  // 34 12
+
+Hacking
+
+For troubleshooting code-gen, it's useful to use the os() function to
+output a string into generated assembly.  For example, using,
+
+    os("; blip\n")
+
+annotates the generated assembly with a comment.  A related trick is
+used by the original author in GEN2.C, where,
+
+    os("stuck=");
+
+is treated like an assert function, inserting deliberate errors into
+generated code to cause a compile failure if invariants are violated.
+
+Gotchas
+
+You must set an environment variable to tell C88 where the system
+headers, such as <stdio.h>, are. Otherwise #include will give you
+file not found errors.  A typical environment-setup script would look
+something like the following,
+
+SET PATH=%PATH;C:\TOOLCHN
+SET DSINC=C:\TOOLCHN
