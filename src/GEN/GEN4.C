@@ -24,6 +24,7 @@ genarith(node,vtype)
 	int  node,vtype[]; {
 	int lnode[7];
 	char type;
+	int llong, vlong;
 
 	type=tree[node];
 	get2(node,vtype,lnode);
@@ -45,11 +46,19 @@ genarith(node,vtype)
 
 /*	take care of long next	*/
 /*	do not allow long + pointer	*/
+	llong = lnode[VT] == CLONG || lnode[VT] == CULONG;
+	vlong = vtype[VT] == CLONG || vtype[VT] == CULONG;
 
-	if (lnode[VT] == PTRTO && vtype[VT] == CLONG) forceint(vtype);
-	if (vtype[VT] == PTRTO && lnode[VT] == CLONG) forceint(lnode);
+	if (lnode[VT] == PTRTO && vlong) {
+		forceint(vtype);
+		vlong = 0;
+		}
+	if (vtype[VT] == PTRTO && llong) {
+		forceint(lnode);
+		llong = 0;
+		}
 
-	if (lnode[VT] == CLONG || vtype[VT] == CLONG) {
+	if (llong || vlong) {
 		forceacx(vtype,lnode);
 		if (type == ADD) {
 			asm_add(ADD86,toreg(AX),toreg2(CX));
@@ -59,8 +68,10 @@ genarith(node,vtype)
 			asm_add(SUB86,toreg(AX),toreg2(CX));
 			asm_add(SBB86,toreg(DX),toreg2(BX));
 			}
-		else
+		else {
 			builtin(type-MUL+_MUL4);	/* call _MUL4 etc. */
+			// TODO need an unsigned version and type miscibility rules
+			}
 		freev(lnode);
 		return;
 		}
@@ -252,7 +263,8 @@ genbin(node,vtype)
 
 	type=tree[node];
 	get2same(node,vtype,lnode);
-	if (lnode[VIS] == CONSTV && vtype[VIS] == CONSTV && vtype[VT] != CLONG) {
+	if (lnode[VIS] == CONSTV && vtype[VIS] == CONSTV &&
+		vtype[VT] != CLONG && vtype[VT] != CULONG) {
 		if (type == OR) vtype[VVAL]|=lnode[VVAL];
 		else if (type == AND) vtype[VVAL]&=lnode[VVAL];
 		else vtype[VVAL]^=lnode[VVAL];
@@ -268,7 +280,7 @@ genbin(node,vtype)
 	else type86=XOR86;
 	asm_add(type86,vtype,lnode);
 	freev(lnode);
-	if (vtype[VT] == CLONG) {
+	if (vtype[VT] == CLONG || vtype[VT] == CULONG) {
 		asm_add(type86,tormh(vtype),tormh2(lnode));
 		}
 	}
@@ -297,7 +309,7 @@ gentest(node,vtype)
 	else {
 		if (vtype[VIS] == CONSTV && (vtype[VT] == CCHAR || vtype[VT] == CSCHAR)) vtype[VT]=CINT;
 		force(vtype,AXPAT);
-		if (ntype == CLONG) forcel(vtype);
+		if (ntype == CLONG || ntype == CULONG) forcel(vtype);
 		else forceint(vtype);
 		}
 	freev(vtype);
@@ -314,7 +326,7 @@ gentest(node,vtype)
 	else {
 		if (vtype[VIS] == CONSTV && (vtype[VT] == CCHAR || vtype[VT] == CSCHAR)) vtype[VT]=CINT;
 		force(vtype,AXPAT);
-		if (ntype == CLONG) forcel(vtype);
+		if (ntype == CLONG || ntype == CULONG) forcel(vtype);
 		else forceint(vtype);
 		}
 	genlab(lab2);
@@ -378,7 +390,7 @@ gencond(node,true,lab,keep)
 				loadf(vtype);
 				builtin(_FIS);
 				}
-			else if (vtype[VT] == CLONG || vtype[VT] == PTRTO) {
+			else if (vtype[VT] == CLONG || vtype[VT] == CULONG || vtype[VT] == PTRTO) {
 				if (vtype[VIS] == VARV || vtype[VT] == PTRTO) {
 					reg=need(ANYPAT);
 					if (is_big) forcees(vtype);
