@@ -168,6 +168,7 @@ main(argc, argv)
 	long int do_depend();
 	char *arg_ptr;
 
+	printf("OpenPCmake v0.4, based on\n");
 	printf("PCmake V1.2, (c) 1984 Michael Ouye\n");
 	arg_ptr = argv[1];
 	arg_index = 1;
