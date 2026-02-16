@@ -2,7 +2,7 @@
 # Makefile for all of the tools on this disk
 #  simply 
 
-$C88FLAGS -t -c -px
+$C88FLAGS -c -px
 
 tools	[ more.exe rm.exe ls.exe  free.exe grep.exe
 			pcmake.exe fastscr.exe merge.exe toolbox.s ]
@@ -11,7 +11,7 @@ tools	[ more.exe rm.exe ls.exe  free.exe grep.exe
 # more
 #
 more.exe	[ more.o toolbox.s ]
-	bind more toolbox.s  -s3000
+	bind more main toolbox.s  -s3000
 
 more.o
 
@@ -19,7 +19,7 @@ more.o
 # rm
 #
 rm.exe	[ rm.o toolbox.s ]
-	bind rm toolbox.s -s2000
+	bind rm main toolbox.s -s2000
 
 rm.o
 
@@ -43,7 +43,7 @@ free.o
 # grep
 #
 grep.exe [ grep.o toolbox.s ]
-	bind grep toolbox.s -s2000
+	bind grep main toolbox.s -s2000
 
 grep.o
 

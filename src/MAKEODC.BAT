@@ -63,6 +63,7 @@ cd ..
 echo Building others
 
 cd other
+copy llink.bat ..\bin\llink.bat
 call other.bat
 if not exist toobj.exe goto stop
 if not exist dumpobj.exe goto stop
@@ -81,8 +82,9 @@ cd ..
 echo Building tools
 
 cd tools
-call makeit.bat
+call maketool.bat
 copy *.exe ..\bin
+copy *.s ..\bin
 cd ..
 
 echo Building more tools
@@ -92,6 +94,10 @@ c88 cb
 bind cb
 if not exist cb.exe goto stop
 copy cb.exe ..\bin\cbcheck.exe
+c88 dump
+bind dump
+if not exist dump.exe goto stop
+copy dump.exe ..\bin\dump.exe
 cd ..
 
 echo Building libraries
