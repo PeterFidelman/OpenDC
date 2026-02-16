@@ -46,7 +46,6 @@ main1(argc, argv)
 use_this_line:
 			puts(cur_line);
 			out_lines++;
-			puts("\n");
 just_wait:
 			if (step || (out_lines >= LINES)) {
 				step = 0;
