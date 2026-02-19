@@ -578,8 +578,11 @@ compare(node)
 
 	if (lnode[VT] == CLONG || lnode[VT] == CULONG || lnode[VT] == PTRTO) {
 		forceacx(lnode,vtype);
-		builtin(_CMP4);				/* call _CMP4 */
-		// TODO unsigned version
+		if (lnode[VT] == CLONG) builtin(_CMP4);
+		else {
+			builtin(_CMP4U);
+			if (type > NE) type=type+4;  /* unsigned comparison */
+			}
 		freev(lnode);
 		freev(vtype);
 		return (type-EQ);
@@ -623,7 +626,7 @@ genshift(node,vtype)
 			if (vtype[VT] == CLONG) {
 				builtin(_SAR4);
 				} else {
-				builtin(_SAR4);  // TODO _SHR4
+				builtin(_SHR4);
 				}
 		else builtin(_SHL4);			 /* call _SHL4 */
 		freev(sby);

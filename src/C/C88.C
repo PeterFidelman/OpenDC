@@ -227,6 +227,7 @@ next_arg:;
 	int_type[0]=CINT;
 	u_type[0]=CUNSG;
 	l_type[0]=CLONG;
+	ul_type[0]=CULONG;
 	ff_type[0]=CFLOAT;
 	fd_type[0]=CDOUBLE;
 	p_type[0]=PTRTO; p_type[1]=CCHAR;

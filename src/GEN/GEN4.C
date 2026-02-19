@@ -24,7 +24,7 @@ genarith(node,vtype)
 	int  node,vtype[]; {
 	int lnode[7];
 	char type;
-	int llong, vlong;
+	int llong, vlong, rtype;
 
 	type=tree[node];
 	get2(node,vtype,lnode);
@@ -59,6 +59,7 @@ genarith(node,vtype)
 		}
 
 	if (llong || vlong) {
+		rtype = comntype(vtype, lnode);
 		forceacx(vtype,lnode);
 		if (type == ADD) {
 			asm_add(ADD86,toreg(AX),toreg2(CX));
@@ -69,9 +70,12 @@ genarith(node,vtype)
 			asm_add(SBB86,toreg(DX),toreg2(BX));
 			}
 		else {
-			builtin(type-MUL+_MUL4);	/* call _MUL4 etc. */
-			// TODO need an unsigned version and type miscibility rules
+			/* generate _MUL4,  _DIV4,     _MOD4, */
+			/*          _MUL4U, _DIV4U, or _MOD4U */
+			if (rtype == CLONG) builtin(type-MUL+_MUL4);
+			else builtin(type-MUL+_MUL4U);
 			}
+		forcetyp(vtype, rtype);
 		freev(lnode);
 		return;
 		}

@@ -106,7 +106,7 @@ init() {
 	initst(&bltname[7],"_FLOADD _FLOADE _FLOADL _FSTORED _FSTOREE ");
 	initst(&bltname[12],"_FSTOREL _FADD _FSUB _FMUL _FDIV _FCMP _FNEG ");
 	initst(&bltname[19],"_FIS _FNOT _FDEC _FINC _FPUSH _FXCH _FCLEAR ");
-	initst(&bltname[26],"_MOVE_ ");
+	initst(&bltname[26],"_MOVE_ _CMP4U _SHR4 _MUL4U _DIV4U _MOD4U ");
 
 #if DEBUG
 	initch(namet,"CHAR  INT   UNSG  LONG  LABEL STRUCTBITS  ");
