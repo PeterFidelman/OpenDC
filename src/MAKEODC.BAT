@@ -23,7 +23,6 @@ echo Building c88.exe
 cd c
 call make_c88.bat
 if not exist my_c88.exe goto stop
-copy my_c88.exe ..\bin\c88.exe
 cd ..
 
 echo Building d88.exe
@@ -41,6 +40,9 @@ call make_gen.bat
 if not exist my_gen.exe goto stop
 copy my_gen.exe ..\bin\gen.exe
 cd ..
+
+@REM update compiler back-end and front-end at the same time
+copy c\my_c88.exe bin\c88.exe
 
 echo Building lib88.exe
 
