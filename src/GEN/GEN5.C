@@ -100,7 +100,7 @@ forceind(vtype)
 	char andit;
 	andit=0;
 	if (vtype[VT] == CFLOAT || vtype[VT] == CDOUBLE) forceint(vtype);
-	if (vtype[VT] == CLONG) {
+	if (vtype[VT] == CLONG || vtype[VT] == CULONG) {
 		if (vtype[VIS] == REGV) {
 			if (vtype[VVAL] == AX) regat[DX]=0;
 			else regat[BX]=0;
@@ -121,7 +121,7 @@ forceind(vtype)
 forcebyt(vtype)
 	int  vtype[]; {
 	if (vtype[VIS] != VARV || floater(vtype)) {
-		if (vtype[VT] == CLONG || floater(vtype))
+		if (vtype[VT] == CLONG || vtype[VT] == CULONG || floater(vtype))
 			forceint(vtype);
 		force(vtype,BYTEPAT);
 		}
@@ -149,7 +149,7 @@ forcef(vtype)
 
 	if (!floater(vtype)) {
 		if (vtype[VIS] == CONSTV) {
-			if (vtype[VT] == CLONG)
+			if (vtype[VT] == CLONG || vtype[VT] == CULONG)
 				((char *)(&vtype[VVAL]))->dbl=((char *)(&vtype[VVAL]))->lng;
 			else ((char *)(&vtype[VVAL]))->dbl=vtype[VVAL];
 			vtype[VT]=CDOUBLE;
@@ -178,7 +178,7 @@ forceint(vtype)
 		return;
 		}
 
-	if (vtype[VT] == CLONG) {
+	if (vtype[VT] == CLONG || vtype[VT] == CULONG) {
 		if (vtype[VIS] == REGV) {
 			if (vtype[VVAL] == AX) regat[DX]=0;
 			else regat[BX]=0;
@@ -317,7 +317,7 @@ forcel(vtype)
 		return;
 		}
 
-	if (vtype[VT] != CLONG) {
+	if (vtype[VT] != CLONG && vtype[VT] != CULONG) {
 		if (vtype[VIS] != CONSTV) {
 			force(vtype,AXCXPAT);
 			if (vtype[VT] == CCHAR) {
@@ -426,7 +426,7 @@ force(vtype,patern)
 	int  i, vval, temp, offtemp, oldvmore;
 
 	if (vtype[VT] == CCHAR) patern&=BYTEPAT;
-	else if (vtype[VT] == CLONG) {
+	else if (vtype[VT] == CLONG || vtype[VT] == CULONG) {
 		if (patern & AXCXPAT) patern&=AXCXPAT;
 		else if (patern & INDPAT && is_big); /* leave it alone */
 		else forceint(vtype);
@@ -541,7 +541,7 @@ movreg(reg,vtype)
 	regat[reg]=vtype;
 	if (is_big && vtype[VIS] == VARV) forcees(vtype);
 	dest_es=-1;
-	if (vtype[VT] == CLONG) {
+	if (vtype[VT] == CLONG || vtype[VT] == CULONG) {
 		if (regpat[reg] & INDPAT) {
 			dest_es=need(ANYPAT);
 			asm_move(toreg(dest_es),tormh(vtype));
@@ -684,7 +684,7 @@ still_need:
 		}
 	if (rneed == -1) error("error in register allocation");
 	vat=regat[rneed];
-	if (vat[VT] != CLONG || vat[VIS] != REGV) {
+	if ((vat[VT] != CLONG && vat[VT] != CULONG) || vat[VIS] != REGV) {
 		reg=7;
 		do {
 			if (regat[reg] == 0 && reg != 4 && reg != 5
@@ -766,7 +766,7 @@ pushv(vtype,need)
 	if (vtype[VT] == CCHAR || vtype[VT] == CSCHAR) forceint(vtype);
 	forcemul(vtype);
 	if (is_big) forcees(vtype);
-	if (vtype[VT] == CLONG || vtype[VT] == PTRTO) {
+	if (vtype[VT] == CLONG || vtype[VT] == CULONG || vtype[VT] == PTRTO) {
 		if (vtype[VT] == PTRTO && vtype[VMORE] == NEED_ES) forcees(vtype);
 		asm_push(PUSH86,tormh(vtype));
 		curoff+=2;
@@ -1177,7 +1177,8 @@ freev(vtype)
 	int  reg,v;
 	v=vtype[VIS];
 	if (v == REGV) {
-		if (vtype[VT] == CLONG) regat[(vtype[VVAL] == AX)? DX: BX]=0;
+		if (vtype[VT] == CLONG || vtype[VT] == CULONG)
+			regat[(vtype[VVAL] == AX)? DX: BX]=0;
 		else if (vtype[VMORE] != -1 && regat[vtype[VMORE]] == vtype)
 			regat[vtype[VMORE]] = 0;
 		regat[vtype[VVAL]]=0;
