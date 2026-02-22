@@ -1449,7 +1449,7 @@ error(str1,str2)
 
 ocrlf() {
 
-	putchar(10);
+	putchar(10, 2);
 	}
 
 ohn(ch)
