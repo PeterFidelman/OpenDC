@@ -125,7 +125,7 @@ init() {
 	/* initialize register names */
 	initst(regname,"AX CX DX BX SP BP SI DI ES DS SS CS ");
 	initst(reglow,"AL CL DL BL ");
-	initst(reghigh,"AH CH DH BH ");
+	initst(reglow+4,"AH CH DH BH ");
 
 /*	operator types
 
