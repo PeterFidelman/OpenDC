@@ -754,7 +754,7 @@ whitesp() {
 			cur++;
 		else if (*cur == '/' && (cur+1)->byte == '/') {
 			cur=lineEnd-1;
-			dolf(1);
+			continue;
 			}
 		else if (*cur == '/' && (cur+1)->byte == '*') {
 			cur+=2;
