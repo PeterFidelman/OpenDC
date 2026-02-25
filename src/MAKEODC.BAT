@@ -62,6 +62,14 @@ if not exist mynbind.exe goto stop
 copy mynbind.exe ..\bin\nbind.exe
 cd ..
 
+echo Building bbind.exe
+
+cd bbind
+call make_bb.bat
+if not exist my_bbind.exe goto stop
+copy my_bbind.exe ..\bin\bbind.exe
+cd ..
+
 echo Building others
 
 cd other
