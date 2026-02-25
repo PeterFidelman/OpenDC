@@ -310,7 +310,8 @@ fixup_seg(segin,fix)
 
 up_addr(segis)
 	int  segis; {
-	char *addrp;
+	/*char *addrp;*/
+	struct long_addr *addrp;
 
 	while (((unsigned) offs[segis]) & 15) add_zero(segis);
 	addrp=&offs[segis];
