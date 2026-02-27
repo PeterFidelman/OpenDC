@@ -1167,10 +1167,12 @@ olow(reg)
 	os(reglow[reg]);
 	}
 
+/*** function not unused
 ohigh(reg)
 	char reg; {
 	os(reghigh[reg]);
 	}
+***/
 
 freev(vtype)
 	int  vtype[]; {

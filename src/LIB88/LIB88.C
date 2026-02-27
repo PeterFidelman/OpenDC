@@ -98,7 +98,7 @@ main(argc,argv)
 init(argc,argv)
 	int  argc;
 	char *argv[]; {
-	char *argat,i;
+	char *argat;
 	int  nin,i,ffile;
 
 
