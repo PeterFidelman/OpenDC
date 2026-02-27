@@ -1167,7 +1167,7 @@ olow(reg)
 	os(reglow[reg]);
 	}
 
-/*** function not unused
+/*** function not used
 ohigh(reg)
 	char reg; {
 	os(reghigh[reg]);

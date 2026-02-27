@@ -132,7 +132,7 @@ copy *.* ..\bin
 cd ..
 
 echo Build complete.
-echo All files should no reside in bin directory.
+echo All files should now reside in bin directory.
 
 goto ok
 
